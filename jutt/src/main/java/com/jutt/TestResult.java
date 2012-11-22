@@ -1,7 +1,11 @@
 package com.jutt;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class TestResult {
@@ -18,5 +22,14 @@ public class TestResult {
             return select.get(0).text();
         }
         return null;
+    }
+
+    public List<String> contents(String selector) {
+        Elements select = parse.select(selector);
+        List<String> ret = new ArrayList<String>();
+        for (Element element : select) {
+            ret.add(element.text());
+        }
+        return ret;
     }
 }

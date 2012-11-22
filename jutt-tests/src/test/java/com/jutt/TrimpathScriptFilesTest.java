@@ -4,14 +4,14 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
 
 import com.google.gson.JsonObject;
 
-public class TrimpathAdditionalFilesTest extends TemplateTest {
+public class TrimpathScriptFilesTest extends TemplateTest {
 
     @Override
     public URL getEngine() {
@@ -24,8 +24,16 @@ public class TrimpathAdditionalFilesTest extends TemplateTest {
     }
 
     @Override
-    public List<URL> additionalFiles() {
-        return Arrays.asList(Utils.fileToURL(new File("src/main/webapp/js/dummyFunction.js")));
+    public List<String> additionalScripts() {
+        List<String> scripts = new ArrayList<String>();
+
+        StringBuilder function = new StringBuilder();
+        function.append("dummyFunction = function (value) {");
+        function.append("    return 'Test';");
+        function.append("};");
+        scripts.add(function.toString());
+
+        return scripts;
     }
 
     @Test
@@ -37,8 +45,8 @@ public class TrimpathAdditionalFilesTest extends TemplateTest {
 
         String template = Utils.readFile("src/main/webapp/template/trimpath/dummy-template-6.html");
         TestResult result = doTemplateAsResult(template, data);
-        assertEquals("My name isMy name is", result.content("h1"));
-        assertEquals("Bond,Bond, James BondJames Bond", result.content(".a"));
-        assertEquals("James BondJames Bond", result.content(".a a"));
+        assertEquals("Test", result.content("h1"));
+        assertEquals("Test Test", result.content(".a"));
+        assertEquals("Test", result.content(".a a"));
     }
 }
