@@ -4,10 +4,13 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.net.URL;
+import java.util.List;
 
 import org.junit.Test;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 public class TrimpathTest extends TemplateTest {
 
@@ -33,6 +36,23 @@ public class TrimpathTest extends TemplateTest {
         assertEquals("My name is", result.content("h1"));
         assertEquals("Bond, James Bond", result.content(".a"));
         assertEquals("James Bond", result.content(".a a"));
+
+        // Contents
+        JsonArray list = new JsonArray();
+        list.add(new JsonPrimitive(1));
+        list.add(new JsonPrimitive(2));
+        list.add(new JsonPrimitive(3));
+
+        data = new JsonObject();
+        data.add("list", list);
+
+        template = Utils.readFile("src/main/webapp/template/trimpath/dummy-template-8.html");
+        result = doTemplateAsResult(template, data);
+        List<String> contents = result.contents("li");
+        assertEquals(3, contents.size());
+        assertEquals("1", contents.get(0));
+        assertEquals("2", contents.get(1));
+        assertEquals("3", contents.get(2));
 
         // Selector
         data = new JsonObject();
