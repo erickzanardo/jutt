@@ -1,0 +1,93 @@
+package com.jutt;
+
+import static org.junit.Assert.assertEquals;
+
+import java.io.File;
+
+import org.junit.Test;
+
+import com.google.gson.JsonObject;
+
+public class TrimpathTest extends TemplateTest {
+
+    @Override
+    public File getEngine() {
+        return new File("src/main/webapp/js/trimpath-template-1.0.38.js");
+    }
+
+    @Override
+    public File getParser() {
+        return new File("src/main/webapp/js/trimpathParser.js");
+    }
+
+    @Test
+    public void testResult() {
+        JsonObject data = new JsonObject();
+        data.addProperty("title", "My name is");
+        data.addProperty("x", "Bond,");
+        data.addProperty("y", "James Bond");
+
+        String template = Utils
+                .readFile("src/main/webapp/template/trimpath/dummy-template-4.html");
+        TestResult result = doTemplateAsResult(template, data);
+        assertEquals("My name is", result.content("h1"));
+        assertEquals("Bond, James Bond", result.content(".a"));
+        assertEquals("James Bond", result.content(".a a"));
+    }
+
+    @Test
+    public void testString() {
+        // dummy-template.html
+        JsonObject data = new JsonObject();
+        data.addProperty("title", "Hello World");
+
+        String template = Utils
+                .readFile("src/main/webapp/template/trimpath/dummy-template.html");
+        String doTemplate = doTemplateAsString(template, data);
+        assertEquals("<h1>Hello World</h1>", doTemplate);
+
+        data = new JsonObject();
+        data.addProperty("title", "Hello World \" ' ");
+
+        template = Utils
+                .readFile("src/main/webapp/template/trimpath/dummy-template.html");
+        doTemplate = doTemplateAsString(template, data);
+        assertEquals("<h1>Hello World \" ' </h1>", doTemplate);
+
+        // dummy-template-2.html
+        data = new JsonObject();
+        data.addProperty("title", "Hello World");
+
+        template = Utils
+                .readFile("src/main/webapp/template/trimpath/dummy-template-2.html");
+        doTemplate = doTemplateAsString(template, data);
+        assertEquals("<h1 class=\"aaa\">Hello World</h1>", doTemplate);
+
+        data = new JsonObject();
+        data.addProperty("title", "Hello World \" ' ");
+
+        template = Utils
+                .readFile("src/main/webapp/template/trimpath/dummy-template-2.html");
+        doTemplate = doTemplateAsString(template, data);
+        assertEquals("<h1 class=\"aaa\">Hello World \" ' </h1>", doTemplate);
+
+        // dummy-template-3.html
+        data = new JsonObject();
+        data.addProperty("title", "Hello World");
+
+        template = Utils
+                .readFile("src/main/webapp/template/trimpath/dummy-template-3.html");
+        doTemplate = doTemplateAsString(template, data);
+        assertEquals("<h1 class='aaa'>Hello World</h1>", doTemplate);
+
+        data = new JsonObject();
+        data.addProperty("title", "Hello World \" ' ");
+
+        template = Utils
+                .readFile("src/main/webapp/template/trimpath/dummy-template-3.html");
+        doTemplate = doTemplateAsString(template, data);
+        assertEquals("<h1 class='aaa'>Hello World \" ' </h1>", doTemplate);
+    }
+
+
+}
