@@ -36,6 +36,7 @@ public class DoTTest extends TemplateTest {
         assertEquals("My name is", result.content("h1"));
         assertEquals("Bond, James Bond", result.content(".a"));
         assertEquals("James Bond", result.content(".a a"));
+        assertEquals("#", result.attr(".a a", "href"));
 
         // Contents
         JsonArray list = new JsonArray();

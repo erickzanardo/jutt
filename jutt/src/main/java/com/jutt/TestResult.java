@@ -24,6 +24,15 @@ public class TestResult {
         return null;
     }
 
+    public String attr(String selector, String attr) {
+        Elements select = parse.select(selector);
+
+        if (select != null && select.size() > 0) {
+            return select.get(0).attr(attr);
+        }
+        return null;
+    }
+
     public List<String> contents(String selector) {
         Elements select = parse.select(selector);
         List<String> ret = new ArrayList<String>();
