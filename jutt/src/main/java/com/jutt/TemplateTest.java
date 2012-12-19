@@ -37,12 +37,12 @@ public class TemplateTest {
         additionalScripts.add(script);
     }
 
-    protected TestResult doTemplateAsResult(String template, JsonObject data, String selector) {
+    public TestResult doTemplateAsResult(String template, JsonObject data, String selector) {
         String templateStr = doTemplateAsString(template, data, selector);
         return new TestResult(templateStr);
     }
 
-    protected String doTemplateAsString(String template, JsonObject data, String selector) {
+    public String doTemplateAsString(String template, JsonObject data, String selector) {
         Document parse = Jsoup.parse(template);
         Elements select = parse.select(selector);
 
@@ -54,12 +54,12 @@ public class TemplateTest {
         return null;
     }
 
-    protected TestResult doTemplateAsResult(String template, JsonObject data) {
+    public TestResult doTemplateAsResult(String template, JsonObject data) {
         String templateStr = doTemplateAsString(template, data);
         return new TestResult(templateStr);
     }
 
-    protected String doTemplateAsString(String template, JsonObject data) {
+    public String doTemplateAsString(String template, JsonObject data) {
 
         Context cx = Context.enter();
         Scriptable scope = cx.initStandardObjects();
