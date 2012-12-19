@@ -4,28 +4,24 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.gson.JsonObject;
 
-public class TrimpathAdditionalFilesTest extends TemplateTest {
+public class TrimpathAdditionalFilesTest {
 
-    @Override
-    public URL getEngine() {
-        return Utils.fileToURL(new File("src/main/webapp/js/trimpath-template-1.0.38.js"));
-    }
+    private static TemplateTest helper;
 
-    @Override
-    public URL getParser() {
-        return Utils.fileToURL(new File("src/main/webapp/js/trimpathParser.js"));
-    }
+    @BeforeClass
+    public static void setup() {
+        URL engine = Utils.fileToURL(new File("src/main/webapp/js/trimpath-template-1.0.38.js"));
+        URL parser = Utils.fileToURL(new File("src/main/webapp/js/trimpathParser.js"));
+        helper = new TemplateTest(engine, parser);
 
-    @Override
-    public List<URL> additionalFiles() {
-        return Arrays.asList(Utils.fileToURL(new File("src/main/webapp/js/dummyFunction.js")));
+        URL url = Utils.fileToURL(new File("src/main/webapp/js/dummyFunction.js"));
+        helper.addAdditionalFile(url);
     }
 
     @Test
@@ -36,7 +32,7 @@ public class TrimpathAdditionalFilesTest extends TemplateTest {
         data.addProperty("y", "James Bond");
 
         String template = Utils.readFile("src/main/webapp/template/trimpath/dummy-template-6.html");
-        TestResult result = doTemplateAsResult(template, data);
+        TestResult result = helper.doTemplateAsResult(template, data);
         assertEquals("My name isMy name is", result.content("h1"));
         assertEquals("Bond,Bond, James BondJames Bond", result.content(".a"));
         assertEquals("James BondJames Bond", result.content(".a a"));

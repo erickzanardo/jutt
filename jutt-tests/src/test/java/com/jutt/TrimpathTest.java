@@ -6,24 +6,23 @@ import java.io.File;
 import java.net.URL;
 import java.util.List;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-public class TrimpathTest extends TemplateTest {
+public class TrimpathTest {
 
-    @Override
-    public URL getEngine() {
-        return Utils.fileToURL(new File("src/main/webapp/js/trimpath-template-1.0.38.js"));
+    private static TemplateTest helper;
+
+    @BeforeClass
+    public static void setup() {
+        URL engine = Utils.fileToURL(new File("src/main/webapp/js/trimpath-template-1.0.38.js"));
+        URL parser = Utils.fileToURL(new File("src/main/webapp/js/trimpathParser.js"));
+        helper = new TemplateTest(engine, parser);
     }
-
-    @Override
-    public URL getParser() {
-        return Utils.fileToURL(new File("src/main/webapp/js/trimpathParser.js"));
-    }
-
     @Test
     public void testResult() {
         JsonObject data = new JsonObject();
@@ -32,7 +31,7 @@ public class TrimpathTest extends TemplateTest {
         data.addProperty("y", "James Bond");
 
         String template = Utils.readFile("src/main/webapp/template/trimpath/dummy-template-4.html");
-        TestResult result = doTemplateAsResult(template, data);
+        TestResult result = helper.doTemplateAsResult(template, data);
         assertEquals("My name is", result.content("h1"));
         assertEquals("Bond, James Bond", result.content(".a"));
         assertEquals("James Bond", result.content(".a a"));
@@ -48,7 +47,7 @@ public class TrimpathTest extends TemplateTest {
         data.add("list", list);
 
         template = Utils.readFile("src/main/webapp/template/trimpath/dummy-template-8.html");
-        result = doTemplateAsResult(template, data);
+        result = helper.doTemplateAsResult(template, data);
         List<String> contents = result.contents("li");
         assertEquals(3, contents.size());
         assertEquals("1", contents.get(0));
@@ -60,12 +59,16 @@ public class TrimpathTest extends TemplateTest {
         data.addProperty("title", "Hello World");
 
         template = Utils.readFile("src/main/webapp/template/trimpath/dummy-template-7.html");
-        result = doTemplateAsResult(template, data, "h1");
+        result = helper.doTemplateAsResult(template, data, "h1");
         assertEquals("Hello World", result.content("h1"));
 
         template = Utils.readFile("src/main/webapp/template/trimpath/dummy-template-7.html");
-        result = doTemplateAsResult(template, data, "h2");
+        result = helper.doTemplateAsResult(template, data, "h2");
         assertEquals("Hello World", result.content("h2"));
+
+        template = Utils.readFile("src/main/webapp/template/trimpath/dummy-template-9.html");
+        result = helper.doTemplateAsResult(template, data, "div");
+        assertEquals("Hello World", result.content("h1"));
 
     }
 
@@ -76,14 +79,14 @@ public class TrimpathTest extends TemplateTest {
         data.addProperty("title", "Hello World");
 
         String template = Utils.readFile("src/main/webapp/template/trimpath/dummy-template.html");
-        String doTemplate = doTemplateAsString(template, data);
+        String doTemplate = helper.doTemplateAsString(template, data);
         assertEquals("<h1>Hello World</h1>", doTemplate);
 
         data = new JsonObject();
         data.addProperty("title", "Hello World \" ' ");
 
         template = Utils.readFile("src/main/webapp/template/trimpath/dummy-template.html");
-        doTemplate = doTemplateAsString(template, data);
+        doTemplate = helper.doTemplateAsString(template, data);
         assertEquals("<h1>Hello World \" ' </h1>", doTemplate);
 
         // dummy-template-2.html
@@ -91,14 +94,14 @@ public class TrimpathTest extends TemplateTest {
         data.addProperty("title", "Hello World");
 
         template = Utils.readFile("src/main/webapp/template/trimpath/dummy-template-2.html");
-        doTemplate = doTemplateAsString(template, data);
+        doTemplate = helper.doTemplateAsString(template, data);
         assertEquals("<h1 class=\"aaa\">Hello World</h1>", doTemplate);
 
         data = new JsonObject();
         data.addProperty("title", "Hello World \" ' ");
 
         template = Utils.readFile("src/main/webapp/template/trimpath/dummy-template-2.html");
-        doTemplate = doTemplateAsString(template, data);
+        doTemplate = helper.doTemplateAsString(template, data);
         assertEquals("<h1 class=\"aaa\">Hello World \" ' </h1>", doTemplate);
 
         // dummy-template-3.html
@@ -106,14 +109,14 @@ public class TrimpathTest extends TemplateTest {
         data.addProperty("title", "Hello World");
 
         template = Utils.readFile("src/main/webapp/template/trimpath/dummy-template-3.html");
-        doTemplate = doTemplateAsString(template, data);
+        doTemplate = helper.doTemplateAsString(template, data);
         assertEquals("<h1 class='aaa'>Hello World</h1>", doTemplate);
 
         data = new JsonObject();
         data.addProperty("title", "Hello World \" ' ");
 
         template = Utils.readFile("src/main/webapp/template/trimpath/dummy-template-3.html");
-        doTemplate = doTemplateAsString(template, data);
+        doTemplate = helper.doTemplateAsString(template, data);
         assertEquals("<h1 class='aaa'>Hello World \" ' </h1>", doTemplate);
 
         // Selector
@@ -121,11 +124,11 @@ public class TrimpathTest extends TemplateTest {
         data.addProperty("title", "Hello World");
 
         template = Utils.readFile("src/main/webapp/template/trimpath/dummy-template-7.html");
-        doTemplate = doTemplateAsString(template, data, "h1");
+        doTemplate = helper.doTemplateAsString(template, data, "h1");
         assertEquals("<h1>Hello World</h1>", doTemplate);
 
         template = Utils.readFile("src/main/webapp/template/trimpath/dummy-template-7.html");
-        doTemplate = doTemplateAsString(template, data, "h2");
+        doTemplate = helper.doTemplateAsString(template, data, "h2");
         assertEquals("<h2>Hello World</h2>", doTemplate);
     }
 

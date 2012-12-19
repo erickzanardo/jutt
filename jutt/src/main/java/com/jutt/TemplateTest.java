@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jsoup.Jsoup;
@@ -14,18 +15,26 @@ import org.mozilla.javascript.Scriptable;
 
 import com.google.gson.JsonObject;
 
-public abstract class TemplateTest {
+public class TemplateTest {
 
-    public abstract URL getEngine();
+    private URL engine;
+    private URL parser;
 
-    public abstract URL getParser();
+    private List<URL> additionalFiles = new ArrayList<URL>();
+    private List<String> additionalScripts = new ArrayList<String>();
 
-    public List<URL> additionalFiles() {
-        return null;
+    public TemplateTest(URL engine, URL parser) {
+        super();
+        this.engine = engine;
+        this.parser = parser;
     }
 
-    public List<String> additionalScripts() {
-        return null;
+    public void addAdditionalFile(URL url) {
+        additionalFiles.add(url);
+    }
+
+    public void addAdditionalScript(String script) {
+        additionalScripts.add(script);
     }
 
     protected TestResult doTemplateAsResult(String template, JsonObject data, String selector) {
@@ -55,17 +64,15 @@ public abstract class TemplateTest {
         Context cx = Context.enter();
         Scriptable scope = cx.initStandardObjects();
 
-        readFile(getEngine(), cx, scope);
-        readFile(getParser(), cx, scope);
+        readFile(engine, cx, scope);
+        readFile(parser, cx, scope);
 
-        List<URL> additionalFiles = additionalFiles();
         if (additionalFiles != null) {
             for (URL file : additionalFiles) {
                 readFile(file, cx, scope);
             }
         }
 
-        List<String> additionalScripts = additionalScripts();
         if (additionalScripts != null) {
             for (String string : additionalScripts) {
                 cx.evaluateString(scope, string, "<cmd>", 1, null);
@@ -75,10 +82,15 @@ public abstract class TemplateTest {
         StringBuilder function = new StringBuilder();
 
         function.append("(function() {return templateTestParser('");
-        function.append(template.replaceAll("'", "\\\\'")).append("', ");
+        function.append(template.replaceAll("\n", "").replaceAll("'", "\\\\'")).append("', ");
         function.append(data).append(");})()");
 
-        return (String) cx.evaluateString(scope, function.toString(), "<cmd>", 1, null);
+        Object evaluateString = cx.evaluateString(scope, function.toString(), "<cmd>", 1, null);
+        if (evaluateString != null) {
+            // Can be NativeString
+            return evaluateString.toString();
+        }
+        return null;
     }
 
     private void readFile(URL url, Context cx, Scriptable scope) {

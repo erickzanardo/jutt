@@ -41,4 +41,14 @@ public class TestResult {
         }
         return ret;
     }
+
+    public List<String> attrs(String selector, String attr) {
+        Elements select = parse.select(selector);
+        List<String> ret = new ArrayList<String>();
+        for (Element element : select) {
+            ret.add(element.attr(attr));
+        }
+        return ret;
+    }
+
 }
