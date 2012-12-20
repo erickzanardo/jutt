@@ -9,7 +9,7 @@ Javascript Unit Test for Templates
 @Test
 public void test() {
 	URL engine = new File("src/main/webapp/js/doT.js").toURI().toURL();
-	URL parser = AbstractTestCase.class.getResource("/dotParser.js");
+	URL parser = TestClass.class.getResource("/dotParser.js");
 	TemplateTest templateHelper = new TemplateTest(engine, parser);
 
 	templateHelper.addAdditionalFile(TestClass.class.getResource("/mockObjects.js"));
