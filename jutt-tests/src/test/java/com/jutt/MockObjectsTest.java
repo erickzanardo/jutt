@@ -32,8 +32,8 @@ public class MockObjectsTest {
         MockObject m3 = new MockObject("b.b").asValue("TESTPATH");
         MockObject m4 = new MockObject("b.bla").asFunction("TESTFUNCTIONPATH");
 
-        MockObject m5 = new MockObject("b.c.d.number").asFunction(3);
-        MockObject m6 = new MockObject("b.c.d.boolean").asFunction(true);
+        MockObject m5 = new MockObject("b.c.d.nnumber").asFunction(3);
+        MockObject m6 = new MockObject("b.c.d.bboolean").asFunction(true);
 
         String template = Utils.readFile("src/main/webapp/template/mock/mock-template.html");
         TestResult result = helper.doTemplateAsResult(template, data, m1, m2, m3, m4, m5, m6);
@@ -44,7 +44,7 @@ public class MockObjectsTest {
         assertEquals("Rhino!TESTPATH", result.content("h1.path"));
         assertEquals("TESTFUNCTIONPATH", result.content("h2.path"));
 
-        assertEquals("3", result.content("h1.pathnumber"));
+        assertEquals("3", result.content("h2.pathnumber"));
         assertEquals("true", result.content("h2.pathboolean"));
     }
 
