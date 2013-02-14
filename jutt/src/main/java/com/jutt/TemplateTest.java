@@ -42,24 +42,24 @@ public class TemplateTest {
         return new TestResult(templateStr);
     }
 
-    public String doTemplateAsString(String template, JsonObject data, String selector) {
+    public String doTemplateAsString(String template, JsonObject data, String selector, MockObject... mockObjects) {
         Document parse = Jsoup.parse(template);
         Elements select = parse.select(selector);
 
         if (select != null && select.size() > 0) {
             String text = select.get(0).outerHtml();
-            return doTemplateAsString(text, data);
+            return doTemplateAsString(text, data, mockObjects);
         }
 
         return null;
     }
 
-    public TestResult doTemplateAsResult(String template, JsonObject data) {
-        String templateStr = doTemplateAsString(template, data);
+    public TestResult doTemplateAsResult(String template, JsonObject data, MockObject... mockObjects) {
+        String templateStr = doTemplateAsString(template, data, mockObjects);
         return new TestResult(templateStr);
     }
 
-    public String doTemplateAsString(String template, JsonObject data) {
+    public String doTemplateAsString(String template, JsonObject data, MockObject... mockObjects) {
 
         Context cx = Context.enter();
         Scriptable scope = cx.initStandardObjects();
@@ -79,6 +79,8 @@ public class TemplateTest {
             }
         }
 
+        resolveMocks(cx, scope, mockObjects);
+
         StringBuilder function = new StringBuilder();
 
         function.append("(function() {return templateTestParser('");
@@ -91,6 +93,52 @@ public class TemplateTest {
             return evaluateString.toString();
         }
         return null;
+    }
+
+    private void resolveMocks(Context cx, Scriptable scope, MockObject[] mockObjects) {
+        if (mockObjects.length > 0) {
+            StringBuilder mocks = new StringBuilder();
+
+            List<String> initializedObjects = new ArrayList<String>();
+
+            for (MockObject o : mockObjects) {
+                String[] path = o.getObject().split("[.]");
+
+                if (path.length > 1) {
+                    // Last array position is the object itself
+                    for (int i = 0; i < path.length - 1; i++) {
+                        String thisObj = "";
+
+                        for (int y = 0; y <= i; y++) {
+                            thisObj += path[y];
+                            if (y < i) {
+                                thisObj += ".";
+                            }
+                        }
+
+                        if (!initializedObjects.contains(thisObj)) {
+                            mocks.append(thisObj).append(" = {} ;");
+                            initializedObjects.add(thisObj);
+                        }
+                    }
+                }
+                String value = "";
+                if (o.getValue() instanceof String) {
+                    value = "'" + o.getValue() + "'";
+                } else {
+                    value = o.getValue().toString();
+                }
+                
+                mocks.append(o.getObject()).append(" = ");
+                if (o.isFunction()) {
+                    mocks.append("function() {return ").append(value).append(";}; ") ;
+                } else {
+                    mocks.append(value).append(";");
+                }
+            }
+
+            cx.evaluateString(scope, mocks.toString(), "<cmd>", 1, null);
+        }
     }
 
     private void readFile(URL url, Context cx, Scriptable scope) {
