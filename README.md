@@ -3,6 +3,10 @@ jutt
 
 Javascript Unit Test for Templates
 
+Tests
+[![Build Status](https://travis-ci.org/erickzanardo/jutt.png)](https://travis-ci.org/erickzanardo/jutt)
+
+
 ```java
 
 // getters, getters and try omitted
