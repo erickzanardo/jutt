@@ -1,6 +1,7 @@
 package com.jutt;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -86,6 +87,16 @@ public class TestResultTest {
         assertEquals("bla", h1Elements.get(0).attr("class"));
         assertEquals("ble", h1Elements.get(1).attr("class"));
         assertEquals("Hello World", h1Elements.content());
+        
+        for (Elements element : h1Elements) {
+			assertNotNull(element.content());
+			if (element.hasClass("bla")) {
+				assertEquals("Hello", element.content());
+			}
+			if (element.hasClass("ble")) {
+				assertEquals("World", element.content());
+			}
+		}
     }
 
 }
