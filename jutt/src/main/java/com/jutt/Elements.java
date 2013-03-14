@@ -2,10 +2,11 @@ package com.jutt;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 import org.jsoup.nodes.Element;
 
-public class Elements {
+public class Elements implements Iterable<Elements> {
 
     private org.jsoup.select.Elements jsoupElements;
 
@@ -41,7 +42,7 @@ public class Elements {
     public Elements get(int index) {
         return new Elements(jsoupElements.get(index));
     }
-    
+
     public boolean hasAttr(String attributeKey) {
         return jsoupElements.hasAttr(attributeKey);
     }
@@ -60,4 +61,36 @@ public class Elements {
         return null;
     }
 
+    @Override
+    public Iterator<Elements> iterator() {
+        return new ElementsIterator(this);
+    }
+
+    public class ElementsIterator implements Iterator<Elements> {
+
+        private Elements elements;
+
+        private int index = 0;
+
+        public ElementsIterator(Elements elements) {
+            super();
+            this.elements = elements;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return elements.size() < index;
+        }
+
+        @Override
+        public Elements next() {
+            return elements.get(index++);
+        }
+
+        @Override
+        public void remove() {
+            // TODO Auto-generated method stub
+        }
+
+    }
 }
