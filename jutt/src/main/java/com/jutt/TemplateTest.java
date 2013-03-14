@@ -131,7 +131,7 @@ public class TemplateTest {
                 
                 mocks.append(o.getObject()).append(" = ");
                 if (o.isFunction()) {
-                    mocks.append("function() {return ").append(value).append(";}; ") ;
+                    mocks.append("function() {return ").append(value).append(";}; ");
                 } else {
                     mocks.append(value).append(";");
                 }
