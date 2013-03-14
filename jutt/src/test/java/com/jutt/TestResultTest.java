@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-
 public class TestResultTest {
 
     @Test
@@ -24,23 +23,19 @@ public class TestResultTest {
         content = r.content("h1 span");
         assertEquals("World", content);
 
-        r = new TestResult(
-                "<div><h1 class=\"bla\">Hello <span>World</span></h1></div>");
+        r = new TestResult("<div><h1 class=\"bla\">Hello <span>World</span></h1></div>");
         content = r.content(".bla");
         assertEquals("Hello World", content);
 
-        r = new TestResult(
-                "<div><h1 class=\"bla\">Hello <span>World</span></h1></div>");
+        r = new TestResult("<div><h1 class=\"bla\">Hello <span>World</span></h1></div>");
         content = r.content(".bla");
         assertEquals("Hello World", content);
 
-        r = new TestResult(
-                "<div><h1 class=\"bla\">Hello</h1><h1 class=\"ble\">World</h1></div>");
+        r = new TestResult("<div><h1 class=\"bla\">Hello</h1><h1 class=\"ble\">World</h1></div>");
         String attr = r.attr(".bla", "class");
         assertEquals("bla", attr);
 
-        r = new TestResult(
-                "<div><h1 class=\"bla\">Hello</h1><h1 class=\"ble\">World</h1></div>");
+        r = new TestResult("<div><h1 class=\"bla\">Hello</h1><h1 class=\"ble\">World</h1></div>");
         List<String> attrs = r.attrs("h1", "class");
         assertEquals(2, attrs.size());
         assertEquals("bla", attrs.get(0));
@@ -60,8 +55,7 @@ public class TestResultTest {
         assertEquals("Hello", div.find("h1").content());
         assertNull(div.find("h2"));
 
-        r = new TestResult(
-                "<div><h1 class=\"bla\">Hello</h1><h1 class=\"ble\">World</h1></div>");
+        r = new TestResult("<div><h1 class=\"bla\">Hello</h1><h1 class=\"ble\">World</h1></div>");
         Elements h1Bla1 = r.find(".bla");
         assertTrue(h1Bla1.hasAttr("class"));
         assertTrue(h1Bla1.hasClass("bla"));
@@ -70,8 +64,7 @@ public class TestResultTest {
         assertEquals(1, h1Bla1.size());
         assertEquals(0, h1Bla1.children().size());
 
-        r = new TestResult(
-                "<div><h1 class=\"bla\">Hello</h1><h1 class=\"ble\">World</h1></div>");
+        r = new TestResult("<div><h1 class=\"bla\">Hello</h1><h1 class=\"ble\">World</h1></div>");
         Elements h1Elements = r.find("h1");
         assertEquals(2, h1Elements.size());
         assertEquals("Hello", h1Elements.get(0).content());
@@ -87,16 +80,16 @@ public class TestResultTest {
         assertEquals("bla", h1Elements.get(0).attr("class"));
         assertEquals("ble", h1Elements.get(1).attr("class"));
         assertEquals("Hello World", h1Elements.content());
-        
+
         for (Elements element : h1Elements) {
-			assertNotNull(element.content());
-			if (element.hasClass("bla")) {
-				assertEquals("Hello", element.content());
-			}
-			if (element.hasClass("ble")) {
-				assertEquals("World", element.content());
-			}
-		}
+            assertNotNull(element.content());
+            if (element.hasClass("bla")) {
+                assertEquals("Hello", element.content());
+            }
+            if (element.hasClass("ble")) {
+                assertEquals("World", element.content());
+            }
+        }
     }
 
 }
