@@ -29,7 +29,7 @@
 		<dependency>
 			<groupId>com.jutt</groupId>
 			<artifactId>jutt</artifactId>
-			<version>1.2.3-SNAPSHOT</version>
+			<version>1.2.3</version>
 		</dependency>
 	</dependencies>
 	<build>
