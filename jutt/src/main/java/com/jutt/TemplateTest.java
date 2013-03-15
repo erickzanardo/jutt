@@ -1,40 +1,52 @@
 package com.jutt;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 
 import com.google.gson.JsonObject;
 
 public class TemplateTest {
 
-    private URL engine;
-    private URL parser;
-
-    private List<URL> additionalFiles = new ArrayList<URL>();
-    private List<String> additionalScripts = new ArrayList<String>();
+    private Map<String, String> filesCache = new HashMap<String, String>();
+    private ScriptableObject scope;
 
     public TemplateTest(URL engine, URL parser) {
         super();
-        this.engine = engine;
-        this.parser = parser;
+
+        // Init global scope
+        Context cx = Context.enter();
+        scope = cx.initStandardObjects();
+
+        readFile(engine, cx, scope);
+        readFile(parser, cx, scope);
+
+        Context.exit();
     }
 
     public void addAdditionalFile(URL url) {
-        additionalFiles.add(url);
+        Context cx = Context.enter();
+        readFile(url, cx, scope);
+        Context.exit();
     }
 
     public void addAdditionalScript(String script) {
-        additionalScripts.add(script);
+        Context cx = Context.enter();
+        cx.evaluateString(scope, script, "<cmd>", 1, null);
+        Context.exit();
     }
 
     public TestResult doTemplateAsResult(String template, JsonObject data, String selector) {
@@ -62,22 +74,6 @@ public class TemplateTest {
     public String doTemplateAsString(String template, JsonObject data, MockObject... mockObjects) {
 
         Context cx = Context.enter();
-        Scriptable scope = cx.initStandardObjects();
-
-        readFile(engine, cx, scope);
-        readFile(parser, cx, scope);
-
-        if (additionalFiles != null) {
-            for (URL file : additionalFiles) {
-                readFile(file, cx, scope);
-            }
-        }
-
-        if (additionalScripts != null) {
-            for (String string : additionalScripts) {
-                cx.evaluateString(scope, string, "<cmd>", 1, null);
-            }
-        }
 
         resolveMocks(cx, scope, mockObjects);
 
@@ -88,6 +84,8 @@ public class TemplateTest {
         function.append(data).append(");})()");
 
         Object evaluateString = cx.evaluateString(scope, function.toString(), "<cmd>", 1, null);
+
+        Context.exit();
         if (evaluateString != null) {
             // Can be NativeString
             return evaluateString.toString();
@@ -128,7 +126,7 @@ public class TemplateTest {
                 } else {
                     value = o.getValue().toString();
                 }
-                
+
                 mocks.append(o.getObject()).append(" = ");
                 if (o.isFunction()) {
                     mocks.append("function() {return ").append(value).append(";}; ");
@@ -142,21 +140,41 @@ public class TemplateTest {
     }
 
     private void readFile(URL url, Context cx, Scriptable scope) {
-        InputStreamReader reader = null;
-        try {
-            InputStream openStream = url.openStream();
-            reader = new InputStreamReader(openStream);
-            cx.evaluateReader(scope, reader, "<cmd>", 1, null);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+        String script = null;
+
+        // Cache files to prevent many I/O operations
+        script = filesCache.get(url.toString());
+
+        if (script == null) {
+            InputStream openStream = null;
+            try {
+                openStream = url.openStream();
+                
+                BufferedReader br = new BufferedReader(new InputStreamReader(openStream));
+                StringBuilder sb = new StringBuilder();
+                
+                String line;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line).append(System.getProperty("line.separator"));
+                }
+                
+                script = sb.toString();
+                filesCache.put(url.toString(), script);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                if (openStream != null) {
+                    try {
+                        openStream.close();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
+        }
+
+        if (script != null) {
+            cx.evaluateString(scope, script, "<cmd>", 1, null);
         }
     }
 }
