@@ -53,6 +53,16 @@ public class TemplateTest {
         String templateStr = doTemplateAsString(template, data, selector);
         return new TestResult(templateStr);
     }
+    
+    public TestResult doTemplateAsResult(String template, JsonObject data, String selector, MockObject... mockObjects) {
+        String templateStr = doTemplateAsString(template, data, selector, mockObjects);
+        return new TestResult(templateStr);
+    }
+    
+    public TestResult doTemplateAsResult(String template, JsonObject data, MockObject... mockObjects) {
+        String templateStr = doTemplateAsString(template, data, mockObjects);
+        return new TestResult(templateStr);
+    }
 
     public String doTemplateAsString(String template, JsonObject data, String selector, MockObject... mockObjects) {
         Document parse = Jsoup.parse(template);
@@ -64,11 +74,6 @@ public class TemplateTest {
         }
 
         return null;
-    }
-
-    public TestResult doTemplateAsResult(String template, JsonObject data, MockObject... mockObjects) {
-        String templateStr = doTemplateAsString(template, data, mockObjects);
-        return new TestResult(templateStr);
     }
 
     public String doTemplateAsString(String template, JsonObject data, MockObject... mockObjects) {
