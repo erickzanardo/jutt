@@ -4,11 +4,11 @@
 	<parent>
 		<groupId>com.jutt</groupId>
 		<artifactId>jutt-parent</artifactId>
-		<version>1.2.4-SNAPSHOT</version>
+		<version>1.2.4</version>
 	</parent>
 	<groupId>com.jutt</groupId>
 	<artifactId>jutt-tests</artifactId>
-	<version>1.2.4-SNAPSHOT</version>
+	<version>1.2.4</version>
 	<packaging>jar</packaging>
 
 	<name>jutt-tests</name>
